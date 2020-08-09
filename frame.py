@@ -3,6 +3,7 @@
 import cv2
 import os
 from skimage.measure import compare_ssim
+import math
 
 from config import splitDuration
 
@@ -18,9 +19,9 @@ def getPicFrame():
     outputDir = './' + outputName
     frameOutputDir = outputDir + '/frames'
 
-    if not(os.path.exists(outputDir)):
+    if not os.path.exists(outputDir):
         os.mkdir(outputDir)
-    if not(os.path.exists(frameOutputDir)):
+    if not os.path.exists(frameOutputDir):
         os.mkdir(frameOutputDir)
 
     vc = cv2.VideoCapture(videoDir) #读入视频文件  
@@ -33,12 +34,13 @@ def getPicFrame():
         rval = False  
 
     timeF = vc.get(5) * splitDuration  #视频帧计数间隔频率 = 帧率 * 切片时间间隔  
-    
+    timeF = math.ceil(timeF)
     while rval:   #循环读取视频帧  
         rval, frame = vc.read()  
         if(c%timeF == 0): #每隔timeF帧进行存储操作  
             frame_h, frame_w, channels = frame.shape
             # frame_s = int(frame_h * ratio)
+            # print('frame_h', frame_h)
             word_area = frame[0:frame_h, 0:frame_w]
             cv2.imwrite(frameOutputDir+'/'+str(c).zfill(10) + '.jpg',word_area) #存储为图像  
         c = c + 1  
